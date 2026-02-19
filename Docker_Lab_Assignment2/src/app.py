@@ -1,5 +1,4 @@
-from flask import Flask, jsonify, request
-from utils import validate_number_input, format_prediction_response
+from utils import vaidate_input, generate_response
 import random
 import os
 
@@ -27,7 +26,7 @@ def health():
 def predict():
     data = request.get_json()
 
-    number = validate_number_input(data)
+    number = validate_input(data.get("name", ""))
 
     # Simulated business logic
     category = "even" if number % 2 == 0 else "odd"
@@ -35,7 +34,7 @@ def predict():
     # Simulated confidence (to make it look production-like)
     confidence = round(random.uniform(0.85, 0.99), 2)
 
-    return jsonify(format_prediction_response(number, category, confidence))
+    return jsonify(generate_response(data.get("name", "")))
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
 
