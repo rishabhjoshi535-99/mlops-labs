@@ -5,33 +5,39 @@ from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error
 
-# Step 1: Create simple dataset (from scratch)
-X = np.array([[1], [2], [3], [4], [5]])
-y = np.array([2, 4, 6, 8, 10])
+# Set experiment name
+mlflow.set_experiment("Lab5_LinearRegression_Experiment")
 
-# Step 2: Split data
+# Create slightly modified dataset
+X = np.array([[1], [2], [3], [4], [5], [6]])
+y = np.array([3, 5, 7, 9, 11, 13])
+
+# Split data
 X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Step 3: Start MLflow run
-with mlflow.start_run():
+# Start MLflow run with name
+with mlflow.start_run(run_name="LinearRegression_Run"):
 
-    # Step 4: Train model
+    # Train model
     model = LinearRegression()
     model.fit(X_train, y_train)
 
-    # Step 5: Predict
+    # Predict
     predictions = model.predict(X_test)
 
-    # Step 6: Calculate metric
+    # Metrics
     mse = mean_squared_error(y_test, predictions)
+    rmse = np.sqrt(mse)
 
-    # Step 7: Log parameter
+    # Log parameters
     mlflow.log_param("model_type", "LinearRegression")
+    mlflow.log_param("dataset_size", len(X))
 
-    # Step 8: Log metric
+    # Log metrics
     mlflow.log_metric("mse", mse)
+    mlflow.log_metric("rmse", rmse)
 
-    # Step 9: Log model
+    # Log model
     mlflow.sklearn.log_model(model, "model")
 
-    print("Model trained and logged successfully!")
+    print("Experiment completed successfully!")
