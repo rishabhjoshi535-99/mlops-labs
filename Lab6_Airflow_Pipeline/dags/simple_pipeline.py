@@ -1,64 +1,65 @@
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 from datetime import datetime, timedelta
+import logging
 
-# Default arguments
+# Default arguments (PRODUCTION STYLE)
 default_args = {
     'owner': 'rishabh',
-    'start_date': datetime(2024, 1, 1),
-    'retries': 1,
-    'retry_delay': timedelta(minutes=1),
+    'retries': 2,
+    'retry_delay': timedelta(minutes=1)
 }
 
-# Define DAG
-dag = DAG(
-    'simple_ml_pipeline',
+# Create DAG
+with DAG(
+    dag_id='simple_ml_pipeline',
     default_args=default_args,
     description='Simple ML pipeline using Airflow',
-    schedule_interval=None,
-    catchup=False,
-)
+    schedule_interval='@daily',   # ✅ added
+    start_date=datetime(2024, 1, 1),
+    catchup=False
+) as dag:
 
-# Task 1: Load Data
-def load_data():
-    print("Loading data...")
+    # TASK 1
+    def load_data():
+        logging.info("Loading data...")
+        print("Data loaded successfully")
 
-# Task 2: Preprocess Data
-def preprocess_data():
-    print("Preprocessing data...")
+    # TASK 2
+    def preprocess_data():
+        logging.info("Preprocessing data...")
+        print("Data preprocessed")
 
-# Task 3: Train Model
-def train_model():
-    print("Training model...")
+    # TASK 3
+    def train_model():
+        logging.info("Training model...")
+        print("Model trained")
 
-# Task 4: Evaluate Model
-def evaluate_model():
-    print("Evaluating model...")
+    # TASK 4
+    def evaluate_model():
+        logging.info("Evaluating model...")
+        print("Model evaluated")
 
-# Create tasks
-load = PythonOperator(
-    task_id='load_data',
-    python_callable=load_data,
-    dag=dag,
-)
+    # Operators
+    load = PythonOperator(
+        task_id='load_data',
+        python_callable=load_data
+    )
 
-preprocess = PythonOperator(
-    task_id='preprocess_data',
-    python_callable=preprocess_data,
-    dag=dag,
-)
+    preprocess = PythonOperator(
+        task_id='preprocess_data',
+        python_callable=preprocess_data
+    )
 
-train = PythonOperator(
-    task_id='train_model',
-    python_callable=train_model,
-    dag=dag,
-)
+    train = PythonOperator(
+        task_id='train_model',
+        python_callable=train_model
+    )
 
-evaluate = PythonOperator(
-    task_id='evaluate_model',
-    python_callable=evaluate_model,
-    dag=dag,
-)
+    evaluate = PythonOperator(
+        task_id='evaluate_model',
+        python_callable=evaluate_model
+    )
 
-# Set dependencies
-load >> preprocess >> train >> evaluate
+    # Task flow
+    load >> preprocess >> train >> evaluate
